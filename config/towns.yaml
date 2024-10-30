@@ -1,0 +1,114 @@
+exp_dir: /home/giuliofederico/raid/results2/new_dataset_superresolution
+epochs: 30000
+seed: 0
+memo: 
+
+model:
+  target: src.models.unet_sr3.UNet
+  params:
+    dims: 3
+    in_channel: 3 
+    out_channel: 1
+    inner_channel: 64
+    norm_groups: 32
+    channel_mults: [1, 2, 4]
+    attn_res: [8]
+    res_blocks: 4
+    dropout: 0.1
+    with_noise_level_emb: yes
+    use_affine_level: yes
+    image_size: 32
+    num_classes: null
+    additive_class_emb: yes
+    use_nd_dropout: no
+
+ddpm:
+  train: &diffusion
+    target: src.models.diffusion.GaussianDiffusion
+    params:
+      loss_type: l1
+      model_mean_type: x_0  
+      schedule_kwargs:
+        schedule: linear
+        n_timestep: 1000
+        linear_start: 1.e-4
+        linear_end: 2.e-2
+        ddim_S: 100
+        ddim_eta: 0.0
+  valid: *diffusion
+
+preprocessor:
+  target: src.models.trainers.sr3d.SR3dPreprocessor
+  params:
+    do_augmentation: yes
+    maxs: [84.82524872,85.77832031]
+    mins: [-16.9120636,-17.55164719]
+    sdf_clip: [0.625, 0.625]
+    mean: [4.2206479181197025, 3.94062095366331] 
+    std: [6.858865119351507, 7.2495764143322585] 
+    patch_size: null
+    downsample: 1
+
+trainer:
+  target: src.models.trainers.sr3d.SR3dTrainer
+  params:
+    find_unused_parameters: no
+    sample_at_least_per_epochs: 20
+    mixed_precision: no
+    n_samples_per_class: 12 
+    n_rows: 6
+    image_size: 32
+    use_ddim: yes
+    ema_decay: 0.99
+
+dataset:
+  target: src.datasets.dataset.build_dataloaders
+  params:
+    ds_kwargs:
+      path_to_db: "/home/giuliofederico/raid/dataset/Game/Carla/Maps" 
+      path_to_statistics: "/home/giuliofederico/SDF-Diffusion_min_max/src/datasets"
+      path_to_condition2_statistics: "/home/giuliofederico/raid/database/scripts/data-fusion-slam-reconstruction/dataset/statistics"
+      number_of_couples: 8
+      cates: town
+      image_size: 64
+    dl_kwargs:
+      batch_size: 16
+      num_workers: 8
+      pin_memory: yes
+      persistent_workers: yes
+
+
+optim:
+  target: torch.optim.Adam
+  params:
+    lr: 0.00003
+    weight_decay: 0.0
+
+train:
+  clip_grad: 1.0
+  num_saves: 10
+
+criterion:
+  target: torch.nn.MSELoss
+
+sched:
+  target: src.scheduler.ReduceLROnPlateauWithWarmup
+  params:
+    mode: min
+    factor: 0.9
+    patience: 15
+    verbose: yes
+    threshold: 1.e-5
+    min_lr: 1.e-25
+    warmup_steps: 1
+  step_on_batch: no
+  step_on_epoch: yes
+
+sample:
+  epochs_to_save: 9
+
+framesencoder:
+  target: src.models.spatio_temporal_frames_encoder.SpatioTemporalHierarchicalFeatures
+  params:
+    number_of_couples: 6
+    image_size: 64

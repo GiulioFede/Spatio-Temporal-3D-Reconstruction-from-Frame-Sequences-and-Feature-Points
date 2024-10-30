@@ -8,7 +8,7 @@
 
 ```
 @inproceedings{10.1145/3672406.3672415,
-author = {Federico, Giulio and Carrara, Fabio and Amato, Giuseppe and Di Benedetto, Marco},
+author = {Federico Giulio and Carrara Fabio and Amato Giuseppe and Di Benedetto Marco},
 title = {Spatio-Temporal 3D Reconstruction from Frame Sequences and Feature Points},
 year = {2024},
 isbn = {9798400717949},

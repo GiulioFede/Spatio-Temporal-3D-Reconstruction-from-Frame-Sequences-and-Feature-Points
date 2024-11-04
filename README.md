@@ -54,8 +54,12 @@ The config file is located in `src/towns`. In the key `dataset->params->ds_kwarg
 
 The dataset must be structured in such a way that at the first level there are folders with the names of the Towns to be modeled. Inside each there must be N folders numbered with integers, each indicating for example a "district" of the city to be modeled. Finally each of these folders has two more: *capture* containing 60 temporal pairs of RGB frames and semantic map, *output* containing the SDF (DxDxD) coarse (10_slam_sdf.npz) and the ground truth (04_scene_sdf.npz).
 
+> [!NOTE]
+> Currently the file configurations are designed to handle 64x64x64 volumes.
+
 The key `dataset->params->ds_kwargs->number_of_couples` specifies the number of pairs (rgb and semantic map) to consider. If there are N pairs in total in the dataset, then the _number_of_couples_ will be taken uniformly along the entire path.
 
+The keys `preprocessor->params->maxs`, `preprocessor->params->mins`, `preprocessor->params->sdf_clip`, `preprocessor->params->mean` and `preprocessor->params->std` must contain the statistics of the dataset. In particular, in each array the first element refers to the coarse statistics, the second to the ground truth. Currently in the file `models->trainers->sr3d.py` only the standardization with previous truncation is implemented.
 
 ## Citation
 

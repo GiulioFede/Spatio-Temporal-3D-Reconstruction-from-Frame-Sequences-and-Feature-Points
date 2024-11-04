@@ -4,6 +4,8 @@ Reconstructing a large real environment is a fundamental task to promote eXtende
 
 ## Dataset and config file
 
+Each experiment will be saved in its own folder whose destination will be indicated in the key `exp_dir`
+
 The config file is located in `src/towns`. In the key `dataset->params->ds_kwargs->path_to_db`, the path to the main folder containing the dataset must be included. The dataset itself must be organized as follows:
 ```
 .
@@ -60,6 +62,16 @@ The dataset must be structured in such a way that at the first level there are f
 The key `dataset->params->ds_kwargs->number_of_couples` specifies the number of pairs (rgb and semantic map) to consider. If there are N pairs in total in the dataset, then the _number_of_couples_ will be taken uniformly along the entire path.
 
 The keys `preprocessor->params->maxs`, `preprocessor->params->mins`, `preprocessor->params->sdf_clip`, `preprocessor->params->mean` and `preprocessor->params->std` must contain the statistics of the dataset. In particular, in each array the first element refers to the coarse statistics, the second to the ground truth. Currently in the file `models->trainers->sr3d.py` only the standardization with previous truncation is implemented.
+
+
+## Training
+Our architecture is two-stage. In the first stage, coarse volumes, in the form of MIP_SDF, are transformed into detailed MI_SDF volumes. In the second, MIP_SDF volumes are transformed back into SDF. Currently, there is a single command to start training the first stage.
+
+```
+python main.py src/config/tows.py
+```
+If you need to use MIP_SDF (vital when the data has a very unbalanced distribution of negative and positive values) consider creating a dataset where each volume is modified by taking its bounding box and enlarging the object until it adheres to the 64x64x64 volume. Train the first stage with this new dataset and the second using the volumes of the new dataset as input and the old dataset as ground truth. Consider modifying the `dataset.py` file so that in the get_item only the volume is returned instead of the volume and the frames.
+An example of the overall pipeline (for inference ) is in the file scripts/test.py.
 
 ## Citation
 

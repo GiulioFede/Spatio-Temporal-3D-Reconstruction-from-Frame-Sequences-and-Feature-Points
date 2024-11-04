@@ -66,8 +66,6 @@ dataset:
   params:
     ds_kwargs:
       path_to_db: "/home/giuliofederico/raid/dataset/Game/Carla/Maps" 
-      path_to_statistics: "/home/giuliofederico/SDF-Diffusion_min_max/src/datasets"
-      path_to_condition2_statistics: "/home/giuliofederico/raid/database/scripts/data-fusion-slam-reconstruction/dataset/statistics"
       number_of_couples: 8
       cates: town
       image_size: 64

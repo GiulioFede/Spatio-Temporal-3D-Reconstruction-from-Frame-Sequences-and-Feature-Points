@@ -114,102 +114,16 @@ class SR3dPreprocessor(trainer.BasePreprocessor):
 
     def standardize(self, x: th.Tensor, i: int):
 
-        # if self.max is not None:
-        #     x = x.clamp(-2*self.sdf_clip[i], 2*self.sdf_clip[i])
-        #     x = 2*((x-self.min[i])/(self.max[i]-self.min[i]))-1
-        #     return x
-        
-        if self.sdf_clip[i] == 0:
-            x = x.sign()
-        else:
-            #bce-------------------------------------------------------
-            #trasformo tutto in -1, 0, e 1
-            # x = x.sign()
-            # #trasformo i valori 0 in -1
-            # x[x==0] = -1
+        x = x.clamp(-self.std[i], self.std[i])
+        x = (x - self.mean[i]) / self.std[i]
 
-            # #traslo per avere solo valori 0 o 1: dove è 0 significa che è 0 la probabilità che la classe sia 1, mentre dov'è 1 significa che è 1 la probabilità della classe 1
-            # x = (x+1)/2
-
-
-
-            #mse
-            #x = x.sign()
-
-            # s = 1
-            # if i==1:
-            #     s = 3
-            # x = x.clamp(-s,s)
-
-            #x = x.clamp(-1,1)
-
-
-
-            mean = 0.2902650363414809 #0.06730790532348715
-            std =  0.23971804149425732 #0.13365173653612408
-            if i == 0:
-                mean = 0.06730790532348715 #0.07576265861651568
-                std =  0.13365173653612408  #0.12975398457880802  
-            
-            #x = x.clamp(-std, std)
-            x = (x - mean) / std
-
-
-            # x = x.clamp(-self.std[i], self.std[i])
-            # x = (x - self.mean[i]) / self.std[i]
-
-        if self.downsample > 1:
-            d = self.downsample
-            x = rearrange(x, "b d (r1 s1) (r2 s2) (r3 s3) -> b (d s1 s2 s3) r1 r2 r3", s1=d, s2=d, s3=d).contiguous()
 
         return x
 
     def destandardize(self, x: th.Tensor, i: int):
-
-        # if self.max is not None:
-        #     x =((x+1)*(self.max[i]-self.min[i])+2*self.min[i])/2
-        #     x = x.clamp(-2*self.sdf_clip[i], 2*self.sdf_clip[i])
-        #     return x
         
-        if self.downsample > 1:
-            d = self.downsample
-            x = rearrange(x, "b (d s1 s2 s3) r1 r2 r3 -> b d (r1 s1) (r2 s2) (r3 s3)", s1=d, s2=d, s3=d).contiguous()
-
-        if self.sdf_clip[i] == 0:
-            x = x.sign()
-        else:
-            #bce ---------------------------------------------------
-            #in arrivo ho un tensore dove ogni pixel è 0 o 1 ad indicare se quel pixel appartiene alla classe -1 o 1.
-            #Quindi semplicemente dov'è 0 sostituisco con -1 e dov'è 1 lo lascio cosi
-            #x[x<=0.5] = -1
-
-
-
-            #mse
-            #x = x.sign()
-
-            
-            # s = 1
-            # if i==1:
-            #     s = 3
-            # x = x.clamp(-s,s)
-            
-            #x = x.clamp(-1,1)
-
-
-            mean = 0.2902650363414809 #0.06730790532348715
-            std =  0.23971804149425732 #0.13365173653612408
-            if i == 0:
-                mean = 0.06730790532348715 #0.07576265861651568
-                std =  0.13365173653612408  #0.12975398457880802    
-                 
-            
-            x = x * std + mean
-            #x = x.clamp(-std, std)
-
-
-            # x = x * self.std[i] + self.mean[i]
-            # x = x.clamp(-self.std[i], self.std[i])
+        x = x * self.std[i] + self.mean[i]
+        x = x.clamp(-self.std[i], self.std[i])
             
         return x
 

@@ -65,7 +65,7 @@ The keys `preprocessor->params->maxs`, `preprocessor->params->mins`, `preprocess
 
 
 ## Training
-Our architecture is two-stage. In the first stage, coarse volumes, in the form of MIP_SDF, are transformed into detailed MI_SDF volumes. In the second, MIP_SDF volumes are transformed back into SDF. Currently, there is a single command to start training the first stage.
+Our architecture is two-stage. In the first stage, coarse volumes, in the form of MIP_SDF, are transformed into detailed MIP_SDF volumes. In the second, MIP_SDF volumes are transformed back into SDF. Currently, there is a single command to start training the first stage.
 
 ```
 python main.py src/config/tows.py

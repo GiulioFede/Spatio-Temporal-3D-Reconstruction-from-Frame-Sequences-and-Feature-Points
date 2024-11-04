@@ -1,7 +1,60 @@
 # Spatio-Temporal-3D-Reconstruction-from-Frame-Sequences-and-Feature-Points
 
+Reconstructing a large real environment is a fundamental task to promote eXtended Reality adoption in industrial and entertainment fields. However, the short range of depth cameras, the sparsity of LiDAR sensors, and the huge computational cost of Structure-from-Motion pipelines prevent scene replication in near real time. To overcome these limitations, we introduce a spatio-temporal diffusion neural architecture, a generative AI technique that fuses temporal information (i.e., a short temporally-ordered list of color photographs, like sparse frames of a video stream) with an approximate spatial resemblance of the explored environment. Our aim is to modify an existing 3D diffusion neural model to produce a Signed Distance Field volume from which a 3D mesh representation can be extracted. 
 
+## Dataset and config file
 
+The config file is located in `src/towns`. In the key `dataset->params->ds_kwargs->path_to_db`, the path to the main folder containing the dataset must be included. The dataset itself must be organized as follows:
+```
+.
+├── Town01
+│   ├── 0
+│   │   ├── capture
+│   │   │   ├── 0_color.png
+│   │   │   ├── 0_sseg.png
+│   │   │   ├── 1_color.png
+│   │   │   ├── 1_sseg.png
+.   .   .   .
+.   .   .   .
+│   │   │   ├── 59_color.png
+│   │   │   ├── 59_sseg.png
+│   │   └── output
+│   │       ├── 04_scene_sdf.npz     <---- ground truth SDF
+│   │       ├── 10_slam_sdf.npz      <---- coarse SDF
+│   ├── 1
+│   │   ├── capture
+│   │   │   ├── 0_color.png
+│   │   │   ├── 0_sseg.png
+│   │   │   ├── 1_color.png
+│   │   │   ├── 1_sseg.png
+.   .   .   .
+.   .   .   .
+│   │   │   ├── 59_color.png
+│   │   │   ├── 59_sseg.png
+│   │   └── output
+│   │       ├── 04_scene_sdf.npz    
+│   │       ├── 10_slam_sdf.npz 
+.   .   .
+.   .   .        
+├── Town02
+│   ├── 0
+│   │   ├── capture
+│   │   │   ├── 0_color.png
+│   │   │   ├── 0_sseg.png
+│   │   │   ├── 1_color.png
+│   │   │   ├── 1_sseg.png
+.   .   .   .
+.   .   .   .
+│   │   │   ├── 59_color.png
+│   │   │   ├── 59_sseg.png
+│   │   └── output
+│   │       ├── 04_scene_sdf.npz     
+│   │       ├── 10_slam_sdf.npz      
+```
+
+The dataset must be structured in such a way that at the first level there are folders with the names of the Towns to be modeled. Inside each there must be N folders numbered with integers, each indicating for example a "district" of the city to be modeled. Finally each of these folders has two more: *capture* containing 60 temporal pairs of RGB frames and semantic map, *output* containing the SDF (DxDxD) coarse (10_slam_sdf.npz) and the ground truth (04_scene_sdf.npz).
+
+The key `dataset->params->ds_kwargs->number_of_couples` specifies the number of pairs (rgb and semantic map) to consider. If there are N pairs in total in the dataset, then the _number_of_couples_ will be taken uniformly along the entire path.
 
 
 ## Citation

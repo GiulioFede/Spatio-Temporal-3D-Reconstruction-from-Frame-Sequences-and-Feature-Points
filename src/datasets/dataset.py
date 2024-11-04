@@ -175,11 +175,10 @@ def compute_mean_std(db, what, mean):
 
 
 class DatasetSR(Dataset):
-    def __init__(self, path_to_db, path_to_statistics, path_to_condition2_statistics, number_of_couples, cates, image_size, split) -> None:
+    def __init__(self, path_to_db, number_of_couples, cates, image_size, split) -> None:
         super().__init__()
 
         self.path_to_db = path_to_db
-        self.path_to_statistics = path_to_statistics
         self.number_of_couples = number_of_couples
         self.seed = 4
         self.train_val_split = 0.15
